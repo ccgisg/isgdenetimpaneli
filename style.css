@@ -6,7 +6,7 @@ body {
 }
 
 .container {
-    max-width: 800px;
+    max-width: 1000px;
     margin: 0 auto;
     background: white;
     padding: 20px;
@@ -40,6 +40,7 @@ button {
     padding: 5px 10px;
     border-radius: 3px;
     cursor: pointer;
+    margin-left: 5px;
 }
 
 button:hover {
@@ -63,8 +64,26 @@ input {
 }
 
 .item {
-    padding: 8px;
+    padding: 10px;
     margin: 5px 0;
     background: #f0f0f0;
     border-radius: 3px;
+    cursor: pointer;
 }
+
+.item:hover {
+    background: #e0e0e0;
+}
+
+.item strong {
+    color: #333;
+}
+
+#employeeDetails {
+    background: #f9f9f9;
+    padding: 15px;
+}
+
+#employeeDetails h3 {
+    margin-top: 0;
+    col
