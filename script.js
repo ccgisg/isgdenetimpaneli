@@ -1,4 +1,15 @@
 document.addEventListener("DOMContentLoaded", function() {
+    // Örnek Veriler (LocalStorage ile değiştirilecek)
+    let workplaces = [
+        { name: "ABC Teknoloji A.Ş.", code: "505-123456789" },
+        { name: "XYZ İnşaat Ltd.", code: "505-587454311" }
+    ];
+
+    let employees = [
+        { name: "Ahmet", surname: "Yılmaz", tckn: "12345678901", department: "Üretim", position: "Teknisyen", workplace: "ABC Teknoloji A.Ş." },
+        { name: "Ayşe", surname: "Kaya", tckn: "10987654321", department: "İnsan Kaynakları", position: "Uzman", workplace: "XYZ İnşaat Ltd." }
+    ];
+
     // DOM Elementleri
     const addWorkplaceBtn = document.getElementById("addWorkplace");
     const workplaceForm = document.getElementById("workplaceForm");
@@ -20,11 +31,7 @@ document.addEventListener("DOMContentLoaded", function() {
     const employeeList = document.getElementById("employeeList");
 
     const employeeDetailsSection = document.getElementById("employeeDetails");
-    const detailsContent = document.getElementById("detailsContent");
-
-    // LocalStorage'dan verileri yükle
-    let workplaces = JSON.parse(localStorage.getItem("workplaces")) || [];
-    let employees = JSON.parse(localStorage.getItem("employees")) || [];
+    const detailsContent = document.querySelector(".details-content");
 
     // İşyeri Ekleme
     addWorkplaceBtn.addEventListener("click", () => workplaceForm.style.display = "block");
@@ -40,7 +47,7 @@ document.addEventListener("DOMContentLoaded", function() {
     renderWorkplaces();
     renderEmployees();
 
-    // İşyeri Kaydetme Fonksiyonu
+    // İşyeri Kaydetme
     function saveWorkplace() {
         const name = workplaceNameInput.value.trim();
         const code = workplaceCodeInput.value.trim();
@@ -51,12 +58,11 @@ document.addEventListener("DOMContentLoaded", function() {
         }
 
         workplaces.push({ name, code });
-        localStorage.setItem("workplaces", JSON.stringify(workplaces));
         renderWorkplaces();
         resetWorkplaceForm();
     }
 
-    // Çalışan Kaydetme Fonksiyonu
+    // Çalışan Kaydetme
     function saveEmployee() {
         const name = employeeNameInput.value.trim();
         const surname = employeeSurnameInput.value.trim();
@@ -69,48 +75,57 @@ document.addEventListener("DOMContentLoaded", function() {
             return;
         }
 
-        employees.push({ name, surname, tckn, department, position });
-        localStorage.setItem("employees", JSON.stringify(employees));
+        employees.push({ name, surname, tckn, department, position, workplace: workplaces[0]?.name || "" });
         renderEmployees();
         resetEmployeeForm();
     }
 
-    // İşyerlerini Listeleme
+    // İşyerlerini Listele
     function renderWorkplaces() {
-        workplaceList.innerHTML = workplaces.map((wp, index) => `
-            <div class="item">
-                <strong>${wp.name}</strong> (Kod: ${wp.code})
-                <button onclick="editWorkplace(${index})">Düzenle</button>
-                <button onclick="deleteWorkplace(${index})">Sil</button>
+        workplaceList.innerHTML = workplaces.map(wp => `
+            <div class="workplace-item">
+                <h3>${wp.name}</h3>
+                <p><strong>Kod:</strong> ${wp.code}</p>
+                <div class="actions">
+                    <button class="edit">Düzenle</button>
+                    <button class="delete">Sil</button>
+                </div>
             </div>
         `).join("");
     }
 
-    // Çalışanları Listeleme
+    // Çalışanları Listele
     function renderEmployees() {
-        employeeList.innerHTML = employees.map((emp, index) => `
-            <div class="item" onclick="showEmployeeDetails(${index})">
-                ${emp.name} ${emp.surname} (TCKN: ${emp.tckn})
-                <button onclick="editEmployee(${index}); event.stopPropagation()">Düzenle</button>
-                <button onclick="deleteEmployee(${index}); event.stopPropagation()">Sil</button>
+        employeeList.innerHTML = employees.map(emp => `
+            <div class="employee-item" onclick="showEmployeeDetails('${emp.tckn}')">
+                <h3>${emp.name} ${emp.surname}</h3>
+                <p><strong>TCKN:</strong> ${emp.tckn}</p>
+                <div class="actions">
+                    <button class="edit">Düzenle</button>
+                    <button class="delete">Sil</button>
+                </div>
             </div>
         `).join("");
     }
 
-    // Çalışan Detaylarını Gösterme
-    window.showEmployeeDetails = function(index) {
-        const emp = employees[index];
+    // Çalışan Detaylarını Göster
+    window.showEmployeeDetails = function(tckn) {
+        const emp = employees.find(e => e.tckn === tckn);
+        if (!emp) return;
+
         detailsContent.innerHTML = `
             <h3>Kişisel Bilgiler</h3>
             <p><strong>Ad Soyad:</strong> ${emp.name} ${emp.surname}</p>
             <p><strong>TCKN:</strong> ${emp.tckn}</p>
             <p><strong>Departman:</strong> ${emp.department || "-"}</p>
             <p><strong>Pozisyon:</strong> ${emp.position || "-"}</p>
+            <h3>İş Bilgileri</h3>
+            <p><strong>İşyeri:</strong> ${emp.workplace || "-"}</p>
         `;
         employeeDetailsSection.style.display = "block";
     };
 
-    // Formları Sıfırlama
+    // Formları Sıfırla
     function resetWorkplaceForm() {
         workplaceForm.style.display = "none";
         workplaceNameInput.value = "";
@@ -125,49 +140,4 @@ document.addEventListener("DOMContentLoaded", function() {
         employeeDepartmentInput.value = "";
         employeePositionInput.value = "";
     }
-
-    // Düzenleme/Silme Fonksiyonları (Global scope'a ekleniyor)
-    window.editWorkplace = function(index) {
-        const wp = workplaces[index];
-        workplaceNameInput.value = wp.name;
-        workplaceCodeInput.value = wp.code;
-        workplaceForm.style.display = "block";
-        
-        saveWorkplaceBtn.onclick = function() {
-            workplaces[index] = { name: workplaceNameInput.value.trim(), code: workplaceCodeInput.value.trim() };
-            localStorage.setItem("workplaces", JSON.stringify(workplaces));
-            renderWorkplaces();
-            resetWorkplaceForm();
-            saveWorkplaceBtn.onclick = saveWorkplace; // Orijinal fonksiyona geri dön
-        };
-    };
-
-    window.deleteWorkplace = function(index) {
-        if (confirm("Bu işyerini silmek istediğinize emin misiniz?")) {
-            workplaces.splice(index, 1);
-            localStorage.setItem("workplaces", JSON.stringify(workplaces));
-            renderWorkplaces();
-        }
-    };
-
-    window.editEmployee = function(index) {
-        const emp = employees[index];
-        employeeNameInput.value = emp.name;
-        employeeSurnameInput.value = emp.surname;
-        employeeTcknInput.value = emp.tckn;
-        employeeDepartmentInput.value = emp.department || "";
-        employeePositionInput.value = emp.position || "";
-        employeeForm.style.display = "block";
-        
-        saveEmployeeBtn.onclick = function() {
-            employees[index] = {
-                name: employeeNameInput.value.trim(),
-                surname: employeeSurnameInput.value.trim(),
-                tckn: employeeTcknInput.value.trim(),
-                department: employeeDepartmentInput.value.trim(),
-                position: employeePositionInput.value.trim()
-            };
-            localStorage.setItem("employees", JSON.stringify(employees));
-            renderEmployees();
-            resetEmployeeForm();
-            saveEmployeeBtn.onclick =
+});
