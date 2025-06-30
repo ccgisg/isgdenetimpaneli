@@ -3,44 +3,78 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>İşyeri ve Çalışan Yönetimi</title>
+    <title>İşyeri Hekimliği Uygulaması</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="container">
-        <h1>İşyeri ve Çalışan Yönetimi</h1>
-        
+        <h1>İşyeri Hekimliği Uygulaması</h1>
+        <p class="subtitle">Çalışan Sağlığı Yönetim Sistemi</p>
+
         <!-- İşyerleri Bölümü -->
         <div class="section">
-            <h2>İşyerleri <button id="addWorkplace">+</button></h2>
-            <div id="workplaceList"></div>
+            <h2>İşyerleri <button id="addWorkplace">+ Yeni İşyeri</button></h2>
+            <div id="workplaceList">
+                <!-- Örnek İşyeri -->
+                <div class="workplace-item">
+                    <h3>ABC Teknoloji A.Ş.</h3>
+                    <p><strong>Kod:</strong> 505-123456789</p>
+                    <div class="actions">
+                        <button class="edit">Düzenle</button>
+                        <button class="delete">Sil</button>
+                    </div>
+                </div>
+            </div>
             <div id="workplaceForm" class="form-container" style="display: none;">
                 <input type="text" id="workplaceName" placeholder="İşyeri Adı*" required>
-                <input type="text" id="workplaceCode" placeholder="İşyeri Kodu*" required>
-                <button id="saveWorkplace">Kaydet</button>
-                <button id="cancelWorkplace">İptal</button>
+                <input type="text" id="workplaceCode" placeholder="Kod (Örn: 505-123456789)*" required>
+                <div class="form-buttons">
+                    <button id="saveWorkplace">Kaydet</button>
+                    <button id="cancelWorkplace">İptal</button>
+                </div>
             </div>
         </div>
 
         <!-- Çalışanlar Bölümü -->
         <div class="section">
-            <h2>Çalışanlar <button id="addEmployee">+</button></h2>
-            <div id="employeeList"></div>
+            <h2>Çalışanlar <button id="addEmployee">+ Yeni Çalışan</button></h2>
+            <div id="employeeList">
+                <!-- Örnek Çalışan -->
+                <div class="employee-item">
+                    <h3>Ahmet Yılmaz</h3>
+                    <p><strong>TCKN:</strong> 12345678901</p>
+                    <div class="actions">
+                        <button class="edit">Düzenle</button>
+                        <button class="delete">Sil</button>
+                    </div>
+                </div>
+            </div>
             <div id="employeeForm" class="form-container" style="display: none;">
                 <input type="text" id="employeeName" placeholder="Ad*" required>
                 <input type="text" id="employeeSurname" placeholder="Soyad*" required>
                 <input type="text" id="employeeTckn" placeholder="TCKN* (11 haneli)" required>
                 <input type="text" id="employeeDepartment" placeholder="Departman">
                 <input type="text" id="employeePosition" placeholder="Pozisyon">
-                <button id="saveEmployee">Kaydet</button>
-                <button id="cancelEmployee">İptal</button>
+                <div class="form-buttons">
+                    <button id="saveEmployee">Kaydet</button>
+                    <button id="cancelEmployee">İptal</button>
+                </div>
             </div>
         </div>
 
         <!-- Çalışan Detayları Bölümü -->
-        <div class="section" id="employeeDetails" style="display: none;">
+        <div class="section" id="employeeDetails">
             <h2>Çalışan Detayları</h2>
-            <div id="detailsContent"></div>
+            <div class="details-content">
+                <h3>Kişisel Bilgiler</h3>
+                <p><strong>Ad Soyad:</strong> Ahmet Yılmaz</p>
+                <p><strong>TCKN:</strong> 12345678901</p>
+                <p><strong>Departman:</strong> Üretim</p>
+                <p><strong>Pozisyon:</strong> Teknisyen</p>
+                <h3>İş Bilgileri</h3>
+                <p><strong>İşyeri:</strong> ABC Teknoloji A.Ş.</p>
+                <p><strong>İşe Giriş Tarihi:</strong> 10/03/2020</p>
+            </div>
         </div>
     </div>
     <script src="script.js"></script>
