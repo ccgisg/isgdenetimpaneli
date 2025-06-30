@@ -445,33 +445,14 @@ function saveUploadedFiles() {
     }
 }
 
-// Ek-2 formunu yazdır
-function printEk2Form() {
-    const employeeId = parseInt(document.getElementById('ek2EmployeeSelect').value);
-    const examDate = document.getElementById('ek2ExamDate').value;
-    const examType = document.getElementById('ek2ExamType').value;
-    
-    if (!employeeId || !examDate) {
-        Swal.fire('Uyarı!', 'Lütfen tüm alanları doldurun.', 'warning');
-        return;
-    }
-    
-    const employee = employees.find(e => e.id === employeeId);
-    const workplace = workplaces.find(w => w.id === employee.workplaceId);
-    
-    if (employee && workplace) {
-        // PDF oluşturma işlemleri buraya gelecek
-        Swal.fire('Başarılı!', 'Ek-2 formu oluşturuldu.', 'success');
-        document.getElementById('ek2CreateModal').style.display = 'none';
-    } else {
-        Swal.fire('Hata!', 'Çalışan veya işyeri bilgileri bulunamadı.', 'error');
-    }
-}
-
 // Excel'den içe aktarma
 function importFromExcel() {
-    // Excel import işlemleri buraya gelecek
-    Swal.fire('Bilgi', 'Excel içe aktarma işlemi henüz tamamlanmadı.', 'info');
+    Swal.fire({
+        title: 'Excel İçe Aktar',
+        text: 'Bu özellik şu anda geliştirme aşamasındadır.',
+        icon: 'info',
+        confirmButtonText: 'Tamam'
+    });
 }
 
 // Excel'e dışa aktarma
@@ -480,7 +461,7 @@ function exportToExcel() {
         Swal.fire('Uyarı!', 'Dışa aktarılacak veri bulunamadı.', 'warning');
         return;
     }
-    
+
     // Sadece mevcut işyerinin çalışanlarını filtrele
     const data = employees.filter(e => e.workplaceId === currentWorkplaceId).map(emp => ({
         'Ad Soyad': emp.name,
@@ -496,4 +477,124 @@ function exportToExcel() {
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, 'Çalışanlar');
     XLSX.writeFile(workbook, 'calisanlar.xlsx');
+}
+
+// Ek-2 formunu oluştur ve yazdır
+function printEk2Form() {
+    const employeeId = parseInt(document.getElementById('ek2EmployeeSelect').value);
+    const examDate = document.getElementById('ek2ExamDate').value;
+    const examType = document.getElementById('ek2ExamType').value;
+    
+    if (!employeeId || !examDate) {
+        Swal.fire('Uyarı!', 'Lütfen tüm alanları doldurun.', 'warning');
+        return;
+    }
+    
+    const employee = employees.find(e => e.id === employeeId);
+    const workplace = workplaces.find(w => w.id === employee.workplaceId);
+    
+    if (employee && workplace) {
+        // Yeni pencere aç ve formu oluştur
+        const printWindow = window.open('', '_blank');
+        printWindow.document.write(`
+            <html>
+            <head>
+                <title>EK-2 Formu</title>
+                <style>
+                    body { font-family: Arial, sans-serif; margin: 20px; }
+                    table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+                    th, td { border: 1px solid #000; padding: 8px; text-align: left; }
+                    .header { text-align: center; margin-bottom: 20px; }
+                    .footer { margin-top: 50px; }
+                    .signature { width: 300px; margin-top: 80px; border-top: 1px solid #000; padding-top: 5px; }
+                </style>
+            </head>
+            <body>
+                <div class="header">
+                    <h2>İŞYERİ HEKİMLİĞİ EK-2 MUAYENE FORMU</h2>
+                </div>
+                
+                <table>
+                    <tr>
+                        <th colspan="2">İŞYERİNİN</th>
+                    </tr>
+                    <tr>
+                        <th>Ünvanı</th>
+                        <td>${workplace.title}</td>
+                    </tr>
+                    <tr>
+                        <th>SGK Sicil No.</th>
+                        <td>${workplace.sgk}</td>
+                    </tr>
+                    <tr>
+                        <th>Adresi</th>
+                        <td>${workplace.address}</td>
+                    </tr>
+                    <tr>
+                        <th>Tel ve Faks No</th>
+                        <td>${workplace.phone}</td>
+                    </tr>
+                    <tr>
+                        <th>E-Posta</th>
+                        <td>${workplace.email}</td>
+                    </tr>
+                    <tr>
+                        <td colspan="2">
+                            İşe giriş/periyodik muayene olmayı kabul ettiğimi ve 
+                            muayene sırasında verdiğim bilgilerin doğru ve eksiksiz olduğunu beyan ederim.
+                            <div style="margin-top: 20px; text-align: right;">
+                                <div>Çalışanın Adı Soyadı: ${employee.name}</div>
+                                <div style="margin-top: 40px;">İMZA</div>
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+                
+                <table>
+                    <tr>
+                        <th colspan="2">ÇALIŞANIN</th>
+                    </tr>
+                    <tr>
+                        <th>Adı ve soyadı</th>
+                        <td>${employee.name}</td>
+                    </tr>
+                    <tr>
+                        <th>T.C.Kimlik No</th>
+                        <td>${employee.tc}</td>
+                    </tr>
+                    <tr>
+                        <th>Muayene Tarihi</th>
+                        <td>${examDate}</td>
+                    </tr>
+                    <tr>
+                        <th>Muayene Türü</th>
+                        <td>${examType} Muayene</td>
+                    </tr>
+                </table>
+                
+                <div class="footer">
+                    <div class="signature"></div>
+                    <div>İşyeri Hekimi İmza</div>
+                    <div style="margin-top: 20px;">
+                        <div>Adı ve Soyadı: ${doctorSettings.name || 'Dr. Adı Soyadı'}</div>
+                        <div>Diploma Tarih ve No: ${doctorSettings.diplomaDate || ''} - ${doctorSettings.diplomaNo || ''}</div>
+                        <div>İşyeri Hekimliği Belgesi Tarih ve No: ${doctorSettings.certificateDate || ''} - ${doctorSettings.certificateNo || ''}</div>
+                    </div>
+                </div>
+                
+                <script>
+                    window.onload = function() {
+                        window.print();
+                        setTimeout(function() {
+                            window.close();
+                        }, 1000);
+                    };
+                </script>
+            </body>
+            </html>
+        `);
+        printWindow.document.close();
+    } else {
+        Swal.fire('Hata!', 'Çalışan veya işyeri bilgileri bulunamadı.', 'error');
+    }
 }
