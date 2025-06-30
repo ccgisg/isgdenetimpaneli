@@ -32,20 +32,93 @@
         }
         
         body {
-            background-color: var(--background);
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
             color: #333;
             line-height: 1.6;
             min-height: 100vh;
             padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
         
         .container {
+            width: 100%;
             max-width: 1600px;
-            margin: 0 auto;
             background-color: white;
             border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
             overflow: hidden;
+            display: none;
+        }
+        
+        #loginContainer {
+            background: white;
+            border-radius: 15px;
+            padding: 40px;
+            width: 100%;
+            max-width: 500px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            text-align: center;
+        }
+        
+        .login-title {
+            color: var(--primary);
+            margin-bottom: 30px;
+            font-size: 2.2rem;
+        }
+        
+        .login-form {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--dark);
+            font-size: 1.1rem;
+        }
+        
+        input[type="text"],
+        input[type="password"] {
+            width: 100%;
+            padding: 14px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        input:focus {
+            outline: none;
+            border-color: var(--secondary);
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+        }
+        
+        .login-btn {
+            padding: 14px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            background-color: var(--success);
+            color: white;
+            font-size: 1.1rem;
+            margin-top: 10px;
+        }
+        
+        .login-btn:hover {
+            background-color: #219653;
+            transform: translateY(-3px);
         }
         
         header {
@@ -117,6 +190,11 @@
             color: white;
         }
         
+        .btn-logout {
+            background-color: var(--dark);
+            color: white;
+        }
+        
         .btn:hover {
             transform: translateY(-3px);
             box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
@@ -135,6 +213,7 @@
             display: grid;
             grid-template-columns: 300px 1fr;
             gap: 30px;
+            min-height: 70vh;
         }
         
         .sidebar {
@@ -219,12 +298,15 @@
         
         .employee-table-container {
             overflow-x: auto;
+            max-height: 60vh;
+            border: 1px solid #eee;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
         }
         
         .employee-table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 20px;
         }
         
         .employee-table th {
@@ -263,6 +345,12 @@
             align-items: center;
             gap: 5px;
             font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+        
+        .table-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
         }
         
         .table-btn.create {
@@ -351,10 +439,6 @@
             grid-template-columns: repeat(2, 1fr);
             gap: 20px;
             margin-bottom: 25px;
-        }
-        
-        .form-group {
-            margin-bottom: 20px;
         }
         
         .form-group label {
@@ -515,10 +599,34 @@
                 grid-template-columns: 1fr;
             }
         }
+        
+        .footer {
+            text-align: center;
+            padding: 20px;
+            background-color: var(--light);
+            border-top: 1px solid #ddd;
+            color: var(--dark);
+            font-size: 0.9rem;
+        }
     </style>
 </head>
 <body>
-    <div class="container">
+    <div id="loginContainer">
+        <h1 class="login-title">İşyeri Hekimliği Uygulaması</h1>
+        <div class="form-group">
+            <label for="username">Kullanıcı Adı</label>
+            <input type="text" id="username" placeholder="Kullanıcı adınızı girin" required>
+        </div>
+        <div class="form-group">
+            <label for="password">Şifre</label>
+            <input type="password" id="password" placeholder="Şifrenizi girin" required>
+        </div>
+        <button class="login-btn" id="loginBtn">
+            <i class="fas fa-sign-in-alt"></i> Giriş Yap
+        </button>
+    </div>
+    
+    <div class="container" id="appContainer">
         <header>
             <div class="logo">
                 <i class="fas fa-user-md"></i>
@@ -528,8 +636,8 @@
                 </div>
             </div>
             <div class="actions">
-                <button class="btn btn-info" id="settingsBtn">
-                    <i class="fas fa-cog"></i> Ayarlar
+                <button class="btn btn-logout" id="logoutBtn">
+                    <i class="fas fa-sign-out-alt"></i> Çıkış Yap
                 </button>
             </div>
         </header>
@@ -585,6 +693,10 @@
                     </table>
                 </div>
             </div>
+        </div>
+        
+        <div class="footer">
+            <p>© 2023 İşyeri Hekimliği Uygulaması - Tüm hakları saklıdır</p>
         </div>
     </div>
     
@@ -865,24 +977,36 @@
         let currentWorkplaceId = workplaces.length > 0 ? workplaces[0].id : null;
         let currentEmployeeId = null;
         
-        // DOM Elementleri
-        const workplaceList = document.getElementById('workplaceList');
-        const employeeTableBody = document.getElementById('employeeTableBody');
-        const addWorkplaceBtn = document.getElementById('addWorkplaceBtn');
-        const addEmployeeBtn = document.getElementById('addEmployeeBtn');
-        const settingsBtn = document.getElementById('settingsBtn');
-        const excelImportBtn = document.getElementById('excelImportBtn');
-        const excelExportBtn = document.getElementById('excelExportBtn');
+        // Giriş işlemi
+        document.getElementById('loginBtn').addEventListener('click', function() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            
+            if (username && password) {
+                // Basit bir doğrulama
+                if (username === "hekim" && password === "1234") {
+                    document.getElementById('loginContainer').style.display = 'none';
+                    document.getElementById('appContainer').style.display = 'block';
+                    initApp();
+                } else {
+                    Swal.fire('Hata!', 'Geçersiz kullanıcı adı veya şifre', 'error');
+                }
+            } else {
+                Swal.fire('Uyarı!', 'Lütfen kullanıcı adı ve şifre girin', 'warning');
+            }
+        });
         
-        // Modal elementleri
-        const workplaceFormModal = document.getElementById('workplaceFormModal');
-        const employeeFormModal = document.getElementById('employeeFormModal');
-        const ek2UploadModal = document.getElementById('ek2UploadModal');
-        const ek2CreateModal = document.getElementById('ek2CreateModal');
-        const settingsModal = document.getElementById('settingsModal');
+        // Çıkış işlemi
+        document.getElementById('logoutBtn').addEventListener('click', function() {
+            document.getElementById('appContainer').style.display = 'none';
+            document.getElementById('loginContainer').style.display = 'block';
+            document.getElementById('username').value = '';
+            document.getElementById('password').value = '';
+        });
         
         // İşyeri listesini güncelle
         function updateWorkplaceList() {
+            const workplaceList = document.getElementById('workplaceList');
             workplaceList.innerHTML = '';
             
             workplaces.forEach(workplace => {
@@ -928,6 +1052,7 @@
         
         // Çalışan tablosunu güncelle
         function updateEmployeeTable() {
+            const employeeTableBody = document.getElementById('employeeTableBody');
             employeeTableBody.innerHTML = '';
             
             const filteredEmployees = employees.filter(emp => 
@@ -1024,7 +1149,7 @@
                 form.reset();
             }
             
-            workplaceFormModal.style.display = 'block';
+            document.getElementById('workplaceFormModal').style.display = 'block';
             document.body.style.overflow = 'hidden';
         }
         
@@ -1062,7 +1187,7 @@
                 }
             }
             
-            employeeFormModal.style.display = 'block';
+            document.getElementById('employeeFormModal').style.display = 'block';
             document.body.style.overflow = 'hidden';
         }
         
@@ -1089,7 +1214,7 @@
                 document.getElementById('ek2Content').value = '';
                 document.getElementById('ek2Result').value = '';
                 
-                ek2CreateModal.style.display = 'block';
+                document.getElementById('ek2CreateModal').style.display = 'block';
                 document.body.style.overflow = 'hidden';
             }
         }
@@ -1107,7 +1232,7 @@
                 document.getElementById('uploadedFiles').innerHTML = '';
                 document.getElementById('ek2FileInput').value = '';
                 
-                ek2UploadModal.style.display = 'block';
+                document.getElementById('ek2UploadModal').style.display = 'block';
                 document.body.style.overflow = 'hidden';
             }
         }
@@ -1332,6 +1457,123 @@
             return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
         }
         
+        // Ek-2 formunu kaydet
+        function saveEk2Form() {
+            const content = document.getElementById('ek2Content').value;
+            const result = document.getElementById('ek2Result').value;
+            
+            if (content && result) {
+                Swal.fire('Başarılı!', 'Ek-2 formu başarıyla kaydedildi.', 'success');
+                document.getElementById('ek2CreateModal').style.display = 'none';
+            } else {
+                Swal.fire('Uyarı!', 'Lütfen tüm alanları doldurun.', 'warning');
+            }
+        }
+        
+        // Ek-2 formunu yazdır
+        function printEk2Form() {
+            const content = document.getElementById('ek2Content').value;
+            const result = document.getElementById('ek2Result').value;
+            
+            if (content && result) {
+                const printWindow = window.open('', '_blank');
+                printWindow.document.write(`
+                    <html>
+                    <head>
+                        <title>Ek-2 Formu</title>
+                        <style>
+                            body { font-family: Arial, sans-serif; margin: 20px; }
+                            h1 { text-align: center; }
+                            .employee-info { margin-bottom: 20px; }
+                            .form-content { margin-top: 30px; }
+                            .signature-area { margin-top: 50px; text-align: center; }
+                            .signature-line { width: 300px; height: 1px; background-color: #000; margin: 20px auto; }
+                        </style>
+                    </head>
+                    <body>
+                        <h1>İŞYERİ HEKİMLİĞİ EK-2 MUAYENE FORMU</h1>
+                        
+                        <div class="employee-info">
+                            <h3>${document.getElementById('ek2EmployeeName').textContent}</h3>
+                            <p>${document.getElementById('ek2EmployeeTc').textContent}</p>
+                            <p>${document.getElementById('ek2EmployeeWorkplace').textContent}</p>
+                            <p>${document.getElementById('ek2ExamDate').textContent}</p>
+                        </div>
+                        
+                        <div class="form-content">
+                            <h4>Muayene Detayları:</h4>
+                            <p>${content.replace(/\n/g, '<br>')}</p>
+                            
+                            <h4>Kanaat ve Sonuç:</h4>
+                            <p>${result.replace(/\n/g, '<br>')}</p>
+                        </div>
+                        
+                        <div class="signature-area">
+                            <div class="signature-line"></div>
+                            <p>İşyeri Hekimi İmza</p>
+                            <p>${document.getElementById('ek2DoctorName').textContent}</p>
+                            <p>${document.getElementById('ek2DiplomaInfo').textContent}</p>
+                            <p>${document.getElementById('ek2CertificateInfo').textContent}</p>
+                        </div>
+                        
+                        <script>
+                            window.onload = function() {
+                                window.print();
+                                setTimeout(function() {
+                                    window.close();
+                                }, 1000);
+                            }
+                        </script>
+                    </body>
+                    </html>
+                `);
+                printWindow.document.close();
+            } else {
+                Swal.fire('Uyarı!', 'Lütfen tüm alanları doldurun.', 'warning');
+            }
+        }
+        
+        // Ayarları aç
+        function openSettings() {
+            document.getElementById('doctorName').value = doctorSettings.name || '';
+            document.getElementById('doctorTitle').value = doctorSettings.title || '';
+            document.getElementById('diplomaDate').value = doctorSettings.diplomaDate || '';
+            document.getElementById('diplomaNo').value = doctorSettings.diplomaNo || '';
+            document.getElementById('certificateDate').value = doctorSettings.certificateDate || '';
+            document.getElementById('certificateNo').value = doctorSettings.certificateNo || '';
+            
+            document.getElementById('settingsModal').style.display = 'block';
+            document.body.style.overflow = 'hidden';
+        }
+        
+        // Ayarları kaydet
+        function saveSettings() {
+            doctorSettings = {
+                name: document.getElementById('doctorName').value,
+                title: document.getElementById('doctorTitle').value,
+                diplomaDate: document.getElementById('diplomaDate').value,
+                diplomaNo: document.getElementById('diplomaNo').value,
+                certificateDate: document.getElementById('certificateDate').value,
+                certificateNo: document.getElementById('certificateNo').value
+            };
+            
+            localStorage.setItem('doctorSettings', JSON.stringify(doctorSettings));
+            document.getElementById('settingsModal').style.display = 'none';
+            
+            Swal.fire('Başarılı!', 'Doktor ayarları kaydedildi.', 'success');
+        }
+        
+        // Yüklenen dosyaları kaydet
+        function saveUploadedFiles() {
+            const fileInput = document.getElementById('ek2FileInput');
+            if (fileInput.files.length > 0) {
+                Swal.fire('Başarılı!', 'Ek-2 formu başarıyla yüklendi.', 'success');
+                document.getElementById('ek2UploadModal').style.display = 'none';
+            } else {
+                Swal.fire('Hata!', 'Lütfen bir dosya seçin.', 'error');
+            }
+        }
+        
         // Uygulama başlatma
         function initApp() {
             // Verileri yükle
@@ -1340,25 +1582,24 @@
             setupFileUpload();
             
             // Event listener'ları ekle
-            addWorkplaceBtn.addEventListener('click', () => openWorkplaceForm());
-            addEmployeeBtn.addEventListener('click', () => openEmployeeForm());
-            settingsBtn.addEventListener('click', openSettings);
-            excelImportBtn.addEventListener('click', importFromExcel);
-            excelExportBtn.addEventListener('click', exportToExcel);
+            document.getElementById('addWorkplaceBtn').addEventListener('click', () => openWorkplaceForm());
+            document.getElementById('addEmployeeBtn').addEventListener('click', () => openEmployeeForm());
+            document.getElementById('excelImportBtn').addEventListener('click', importFromExcel);
+            document.getElementById('excelExportBtn').addEventListener('click', exportToExcel);
             
             // Form kapatma butonları
-            document.getElementById('closeWorkplaceForm').addEventListener('click', () => workplaceFormModal.style.display = 'none');
-            document.getElementById('closeEmployeeForm').addEventListener('click', () => employeeFormModal.style.display = 'none');
-            document.getElementById('closeEk2Upload').addEventListener('click', () => ek2UploadModal.style.display = 'none');
-            document.getElementById('closeEk2Create').addEventListener('click', () => ek2CreateModal.style.display = 'none');
-            document.getElementById('closeSettings').addEventListener('click', () => settingsModal.style.display = 'none');
+            document.getElementById('closeWorkplaceForm').addEventListener('click', () => document.getElementById('workplaceFormModal').style.display = 'none');
+            document.getElementById('closeEmployeeForm').addEventListener('click', () => document.getElementById('employeeFormModal').style.display = 'none');
+            document.getElementById('closeEk2Upload').addEventListener('click', () => document.getElementById('ek2UploadModal').style.display = 'none');
+            document.getElementById('closeEk2Create').addEventListener('click', () => document.getElementById('ek2CreateModal').style.display = 'none');
+            document.getElementById('closeSettings').addEventListener('click', () => document.getElementById('settingsModal').style.display = 'none');
             
             // Form iptal butonları
-            document.getElementById('cancelWorkplaceForm').addEventListener('click', () => workplaceFormModal.style.display = 'none');
-            document.getElementById('cancelEmployeeForm').addEventListener('click', () => employeeFormModal.style.display = 'none');
-            document.getElementById('cancelEk2Upload').addEventListener('click', () => ek2UploadModal.style.display = 'none');
-            document.getElementById('cancelEk2Form').addEventListener('click', () => ek2CreateModal.style.display = 'none');
-            document.getElementById('cancelSettings').addEventListener('click', () => settingsModal.style.display = 'none');
+            document.getElementById('cancelWorkplaceForm').addEventListener('click', () => document.getElementById('workplaceFormModal').style.display = 'none');
+            document.getElementById('cancelEmployeeForm').addEventListener('click', () => document.getElementById('employeeFormModal').style.display = 'none');
+            document.getElementById('cancelEk2Upload').addEventListener('click', () => document.getElementById('ek2UploadModal').style.display = 'none');
+            document.getElementById('cancelEk2Form').addEventListener('click', () => document.getElementById('ek2CreateModal').style.display = 'none');
+            document.getElementById('cancelSettings').addEventListener('click', () => document.getElementById('settingsModal').style.display = 'none');
             
             // Form submit işlemleri
             document.getElementById('workplaceForm').addEventListener('submit', saveWorkplace);
@@ -1370,11 +1611,11 @@
             
             // Dışarı tıklayınca modalları kapat
             window.addEventListener('click', (e) => {
-                if (e.target === workplaceFormModal) workplaceFormModal.style.display = 'none';
-                if (e.target === employeeFormModal) employeeFormModal.style.display = 'none';
-                if (e.target === ek2UploadModal) ek2UploadModal.style.display = 'none';
-                if (e.target === ek2CreateModal) ek2CreateModal.style.display = 'none';
-                if (e.target === settingsModal) settingsModal.style.display = 'none';
+                if (e.target === document.getElementById('workplaceFormModal')) document.getElementById('workplaceFormModal').style.display = 'none';
+                if (e.target === document.getElementById('employeeFormModal')) document.getElementById('employeeFormModal').style.display = 'none';
+                if (e.target === document.getElementById('ek2UploadModal')) document.getElementById('ek2UploadModal').style.display = 'none';
+                if (e.target === document.getElementById('ek2CreateModal')) document.getElementById('ek2CreateModal').style.display = 'none';
+                if (e.target === document.getElementById('settingsModal')) document.getElementById('settingsModal').style.display = 'none';
             });
         }
         
@@ -1417,7 +1658,7 @@
             
             localStorage.setItem('workplaces', JSON.stringify(workplaces));
             updateWorkplaceList();
-            workplaceFormModal.style.display = 'none';
+            document.getElementById('workplaceFormModal').style.display = 'none';
             
             Swal.fire('Başarılı!', 'İşyeri bilgileri kaydedildi.', 'success');
         }
@@ -1470,127 +1711,10 @@
             
             localStorage.setItem('employees', JSON.stringify(employees));
             updateEmployeeTable();
-            employeeFormModal.style.display = 'none';
+            document.getElementById('employeeFormModal').style.display = 'none';
             
             Swal.fire('Başarılı!', 'Çalışan bilgileri kaydedildi.', 'success');
         }
-        
-        // Ek-2 formunu kaydet
-        function saveEk2Form() {
-            const content = document.getElementById('ek2Content').value;
-            const result = document.getElementById('ek2Result').value;
-            
-            if (content && result) {
-                Swal.fire('Başarılı!', 'Ek-2 formu başarıyla kaydedildi.', 'success');
-                ek2CreateModal.style.display = 'none';
-            } else {
-                Swal.fire('Uyarı!', 'Lütfen tüm alanları doldurun.', 'warning');
-            }
-        }
-        
-        // Ek-2 formunu yazdır
-        function printEk2Form() {
-            const content = document.getElementById('ek2Content').value;
-            const result = document.getElementById('ek2Result').value;
-            
-            if (content && result) {
-                const printWindow = window.open('', '_blank');
-                printWindow.document.write(`
-                    <html>
-                    <head>
-                        <title>Ek-2 Formu</title>
-                        <style>
-                            body { font-family: Arial, sans-serif; margin: 20px; }
-                            h1 { text-align: center; }
-                            .employee-info { margin-bottom: 20px; }
-                            .form-content { margin-top: 30px; }
-                            .signature-area { margin-top: 50px; text-align: center; }
-                            .signature-line { width: 300px; height: 1px; background-color: #000; margin: 20px auto; }
-                        </style>
-                    </head>
-                    <body>
-                        <h1>İŞYERİ HEKİMLİĞİ EK-2 MUAYENE FORMU</h1>
-                        
-                        <div class="employee-info">
-                            <h3>${document.getElementById('ek2EmployeeName').textContent}</h3>
-                            <p>${document.getElementById('ek2EmployeeTc').textContent}</p>
-                            <p>${document.getElementById('ek2EmployeeWorkplace').textContent}</p>
-                            <p>${document.getElementById('ek2ExamDate').textContent}</p>
-                        </div>
-                        
-                        <div class="form-content">
-                            <h4>Muayene Detayları:</h4>
-                            <p>${content}</p>
-                            
-                            <h4>Kanaat ve Sonuç:</h4>
-                            <p>${result}</p>
-                        </div>
-                        
-                        <div class="signature-area">
-                            <div class="signature-line"></div>
-                            <p>İşyeri Hekimi İmza</p>
-                            <p>${document.getElementById('ek2DoctorName').textContent}</p>
-                            <p>${document.getElementById('ek2DiplomaInfo').textContent}</p>
-                            <p>${document.getElementById('ek2CertificateInfo').textContent}</p>
-                        </div>
-                        
-                        <script>
-                            window.onload = function() {
-                                window.print();
-                            }
-                        </script>
-                    </body>
-                    </html>
-                `);
-                printWindow.document.close();
-            } else {
-                Swal.fire('Uyarı!', 'Lütfen tüm alanları doldurun.', 'warning');
-            }
-        }
-        
-        // Ayarları aç
-        function openSettings() {
-            document.getElementById('doctorName').value = doctorSettings.name || '';
-            document.getElementById('doctorTitle').value = doctorSettings.title || '';
-            document.getElementById('diplomaDate').value = doctorSettings.diplomaDate || '';
-            document.getElementById('diplomaNo').value = doctorSettings.diplomaNo || '';
-            document.getElementById('certificateDate').value = doctorSettings.certificateDate || '';
-            document.getElementById('certificateNo').value = doctorSettings.certificateNo || '';
-            
-            settingsModal.style.display = 'block';
-            document.body.style.overflow = 'hidden';
-        }
-        
-        // Ayarları kaydet
-        function saveSettings() {
-            doctorSettings = {
-                name: document.getElementById('doctorName').value,
-                title: document.getElementById('doctorTitle').value,
-                diplomaDate: document.getElementById('diplomaDate').value,
-                diplomaNo: document.getElementById('diplomaNo').value,
-                certificateDate: document.getElementById('certificateDate').value,
-                certificateNo: document.getElementById('certificateNo').value
-            };
-            
-            localStorage.setItem('doctorSettings', JSON.stringify(doctorSettings));
-            settingsModal.style.display = 'none';
-            
-            Swal.fire('Başarılı!', 'Doktor ayarları kaydedildi.', 'success');
-        }
-        
-        // Yüklenen dosyaları kaydet
-        function saveUploadedFiles() {
-            const fileInput = document.getElementById('ek2FileInput');
-            if (fileInput.files.length > 0) {
-                Swal.fire('Başarılı!', 'Ek-2 formu başarıyla yüklendi.', 'success');
-                ek2UploadModal.style.display = 'none';
-            } else {
-                Swal.fire('Hata!', 'Lütfen bir dosya seçin.', 'error');
-            }
-        }
-        
-        // Uygulamayı başlat
-        document.addEventListener('DOMContentLoaded', initApp);
     </script>
 </body>
 </html>
