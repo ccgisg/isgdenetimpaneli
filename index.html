@@ -744,6 +744,56 @@
         </div>
     </div>
     
+    <!-- Ek-2 Formu Oluşturma Modalı -->
+    <div class="form-container" id="ek2CreateModal">
+        <div class="form-content">
+            <button class="close-btn" id="closeEk2Create">
+                <i class="fas fa-times"></i>
+            </button>
+            
+            <h2 class="form-title">İŞYERİ HEKİMLİĞİ EK-2 MUAYENE FORMU</h2>
+            
+            <div class="employee-info">
+                <h3 id="ek2EmployeeName"></h3>
+                <p id="ek2EmployeeTc"></p>
+                <p id="ek2EmployeeWorkplace"></p>
+                <p id="ek2ExamDate"></p>
+            </div>
+            
+            <div class="form-group">
+                <label for="ek2Content">Muayene Detayları</label>
+                <textarea id="ek2Content" rows="12" placeholder="Muayene detaylarını buraya yazın..."></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label for="ek2Result">Kanaat ve Sonuç</label>
+                <textarea id="ek2Result" rows="4" placeholder="Kanaat ve sonuçları buraya yazın..."></textarea>
+            </div>
+            
+            <div class="signature-area">
+                <div class="signature-line"></div>
+                <div class="signature-label">İşyeri Hekimi İmza</div>
+                <div style="margin-top: 15px;">
+                    <p>Adı ve Soyadı: <strong id="ek2DoctorName">Dr. Ayşe Kaya</strong></p>
+                    <p>Diploma Tarih ve No: <span id="ek2DiplomaInfo">15/06/2010 - 12345</span></p>
+                    <p>İşyeri Hekimliği Belgesi Tarih ve No: <span id="ek2CertificateInfo">20/07/2015 - 67890</span></p>
+                </div>
+            </div>
+            
+            <div class="form-actions" style="margin-top: 30px;">
+                <button type="button" class="btn btn-primary" id="saveEk2Form">
+                    <i class="fas fa-save"></i> Formu Kaydet
+                </button>
+                <button type="button" class="btn btn-secondary" id="printEk2Form">
+                    <i class="fas fa-print"></i> Yazdır
+                </button>
+                <button type="button" class="btn" id="cancelEk2Form" style="background-color: #95a5a6; color: white;">
+                    <i class="fas fa-times"></i> İptal
+                </button>
+            </div>
+        </div>
+    </div>
+    
     <!-- Ayarlar Modalı -->
     <div class="form-container" id="settingsModal">
         <div class="form-content">
@@ -828,6 +878,7 @@
         const workplaceFormModal = document.getElementById('workplaceFormModal');
         const employeeFormModal = document.getElementById('employeeFormModal');
         const ek2UploadModal = document.getElementById('ek2UploadModal');
+        const ek2CreateModal = document.getElementById('ek2CreateModal');
         const settingsModal = document.getElementById('settingsModal');
         
         // İşyeri listesini güncelle
@@ -1018,19 +1069,28 @@
         // Ek-2 formu oluştur
         function createEk2Form(employeeId) {
             const employee = employees.find(e => e.id === employeeId);
-            if (employee) {
-                Swal.fire({
-                    title: 'Ek-2 Formu Oluştur',
-                    text: `${employee.name} için Ek-2 formu oluşturulacak.`,
-                    icon: 'info',
-                    showCancelButton: true,
-                    confirmButtonText: 'Oluştur',
-                    cancelButtonText: 'İptal'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        Swal.fire('Başarılı!', 'Ek-2 formu oluşturuldu.', 'success');
-                    }
-                });
+            const workplace = workplaces.find(w => w.id === employee.workplaceId);
+            
+            if (employee && workplace) {
+                document.getElementById('ek2EmployeeName').textContent = employee.name;
+                document.getElementById('ek2EmployeeTc').textContent = `TC: ${employee.tc}`;
+                document.getElementById('ek2EmployeeWorkplace').textContent = `İşyeri: ${workplace.title}`;
+                
+                // Bugünkü tarihi ekleyelim
+                const today = new Date();
+                document.getElementById('ek2ExamDate').textContent = `Muayene Tarihi: ${today.toLocaleDateString('tr-TR')}`;
+                
+                // Doktor bilgilerini ayarlardan al
+                document.getElementById('ek2DoctorName').textContent = doctorSettings.name || 'Dr. Ayşe Kaya';
+                document.getElementById('ek2DiplomaInfo').textContent = doctorSettings.diplomaNo ? `${doctorSettings.diplomaDate} - ${doctorSettings.diplomaNo}` : '15/06/2010 - 12345';
+                document.getElementById('ek2CertificateInfo').textContent = doctorSettings.certificateNo ? `${doctorSettings.certificateDate} - ${doctorSettings.certificateNo}` : '20/07/2015 - 67890';
+                
+                // Form içeriğini sıfırla
+                document.getElementById('ek2Content').value = '';
+                document.getElementById('ek2Result').value = '';
+                
+                ek2CreateModal.style.display = 'block';
+                document.body.style.overflow = 'hidden';
             }
         }
         
@@ -1122,25 +1182,70 @@
         
         // Excel'den içe aktar
         function importFromExcel() {
-            Swal.fire({
-                title: 'Excel\'den Veri Al',
-                text: 'Excel dosyasından çalışan verilerini içe aktar',
-                icon: 'info',
-                showCancelButton: true,
-                confirmButtonText: 'Dosya Seç',
-                cancelButtonText: 'İptal'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    // Burada gerçek Excel import işlemi yapılacak
-                    Swal.fire('Başarılı!', 'Excel verileri başarıyla içe aktarıldı.', 'success');
-                    updateEmployeeTable();
-                }
-            });
+            // Dosya seçme inputu oluştur
+            const fileInput = document.createElement('input');
+            fileInput.type = 'file';
+            fileInput.accept = '.xlsx, .xls';
+            
+            fileInput.onchange = e => {
+                const file = e.target.files[0];
+                if (!file) return;
+                
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    try {
+                        const data = new Uint8Array(e.target.result);
+                        const workbook = XLSX.read(data, {type: 'array'});
+                        
+                        // İlk sayfayı al
+                        const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+                        const jsonData = XLSX.utils.sheet_to_json(firstSheet);
+                        
+                        if (jsonData.length > 0) {
+                            // JSON verisini çalışanlara dönüştür
+                            const newEmployees = jsonData.map(row => ({
+                                id: employees.length > 0 ? Math.max(...employees.map(e => e.id)) + 1 : 1,
+                                workplaceId: currentWorkplaceId || 1,
+                                name: row['İsim Soyisim'] || '',
+                                tc: row['TC Kimlik No'] || '',
+                                department: row['Departman'] || '',
+                                position: row['Pozisyon'] || '',
+                                startDate: row['İşe Giriş Tarihi'] || '',
+                                firstExamDate: row['İlk Muayene Tarihi'] || '',
+                                lastExamDate: row['Son Muayene Tarihi'] || ''
+                            }));
+                            
+                            employees = [...employees, ...newEmployees];
+                            localStorage.setItem('employees', JSON.stringify(employees));
+                            updateEmployeeTable();
+                            
+                            Swal.fire('Başarılı!', `${newEmployees.length} çalışan başarıyla içe aktarıldı.`, 'success');
+                        }
+                    } catch (error) {
+                        Swal.fire('Hata!', 'Excel dosyası okunurken bir hata oluştu.', 'error');
+                        console.error(error);
+                    }
+                };
+                
+                reader.readAsArrayBuffer(file);
+            };
+            
+            fileInput.click();
         }
         
         // Excel'e dışa aktar
         function exportToExcel() {
-            const worksheet = XLSX.utils.json_to_sheet(employees);
+            const worksheet = XLSX.utils.json_to_sheet(employees.map(emp => ({
+                'İsim Soyisim': emp.name,
+                'TC Kimlik No': emp.tc,
+                'İşyeri': workplaces.find(w => w.id === emp.workplaceId)?.title || '',
+                'Departman': emp.department,
+                'Pozisyon': emp.position,
+                'İşe Giriş Tarihi': emp.startDate,
+                'İlk Muayene Tarihi': emp.firstExamDate,
+                'Son Muayene Tarihi': emp.lastExamDate
+            })));
+            
             const workbook = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(workbook, worksheet, "Çalışanlar");
             XLSX.writeFile(workbook, "calisan_listesi.xlsx");
@@ -1245,18 +1350,22 @@
             document.getElementById('closeWorkplaceForm').addEventListener('click', () => workplaceFormModal.style.display = 'none');
             document.getElementById('closeEmployeeForm').addEventListener('click', () => employeeFormModal.style.display = 'none');
             document.getElementById('closeEk2Upload').addEventListener('click', () => ek2UploadModal.style.display = 'none');
+            document.getElementById('closeEk2Create').addEventListener('click', () => ek2CreateModal.style.display = 'none');
             document.getElementById('closeSettings').addEventListener('click', () => settingsModal.style.display = 'none');
             
             // Form iptal butonları
             document.getElementById('cancelWorkplaceForm').addEventListener('click', () => workplaceFormModal.style.display = 'none');
             document.getElementById('cancelEmployeeForm').addEventListener('click', () => employeeFormModal.style.display = 'none');
             document.getElementById('cancelEk2Upload').addEventListener('click', () => ek2UploadModal.style.display = 'none');
+            document.getElementById('cancelEk2Form').addEventListener('click', () => ek2CreateModal.style.display = 'none');
             document.getElementById('cancelSettings').addEventListener('click', () => settingsModal.style.display = 'none');
             
             // Form submit işlemleri
             document.getElementById('workplaceForm').addEventListener('submit', saveWorkplace);
             document.getElementById('employeeForm').addEventListener('submit', saveEmployee);
             document.getElementById('saveEk2Upload').addEventListener('click', saveUploadedFiles);
+            document.getElementById('saveEk2Form').addEventListener('click', saveEk2Form);
+            document.getElementById('printEk2Form').addEventListener('click', printEk2Form);
             document.getElementById('saveSettings').addEventListener('click', saveSettings);
             
             // Dışarı tıklayınca modalları kapat
@@ -1264,6 +1373,7 @@
                 if (e.target === workplaceFormModal) workplaceFormModal.style.display = 'none';
                 if (e.target === employeeFormModal) employeeFormModal.style.display = 'none';
                 if (e.target === ek2UploadModal) ek2UploadModal.style.display = 'none';
+                if (e.target === ek2CreateModal) ek2CreateModal.style.display = 'none';
                 if (e.target === settingsModal) settingsModal.style.display = 'none';
             });
         }
@@ -1363,6 +1473,79 @@
             employeeFormModal.style.display = 'none';
             
             Swal.fire('Başarılı!', 'Çalışan bilgileri kaydedildi.', 'success');
+        }
+        
+        // Ek-2 formunu kaydet
+        function saveEk2Form() {
+            const content = document.getElementById('ek2Content').value;
+            const result = document.getElementById('ek2Result').value;
+            
+            if (content && result) {
+                Swal.fire('Başarılı!', 'Ek-2 formu başarıyla kaydedildi.', 'success');
+                ek2CreateModal.style.display = 'none';
+            } else {
+                Swal.fire('Uyarı!', 'Lütfen tüm alanları doldurun.', 'warning');
+            }
+        }
+        
+        // Ek-2 formunu yazdır
+        function printEk2Form() {
+            const content = document.getElementById('ek2Content').value;
+            const result = document.getElementById('ek2Result').value;
+            
+            if (content && result) {
+                const printWindow = window.open('', '_blank');
+                printWindow.document.write(`
+                    <html>
+                    <head>
+                        <title>Ek-2 Formu</title>
+                        <style>
+                            body { font-family: Arial, sans-serif; margin: 20px; }
+                            h1 { text-align: center; }
+                            .employee-info { margin-bottom: 20px; }
+                            .form-content { margin-top: 30px; }
+                            .signature-area { margin-top: 50px; text-align: center; }
+                            .signature-line { width: 300px; height: 1px; background-color: #000; margin: 20px auto; }
+                        </style>
+                    </head>
+                    <body>
+                        <h1>İŞYERİ HEKİMLİĞİ EK-2 MUAYENE FORMU</h1>
+                        
+                        <div class="employee-info">
+                            <h3>${document.getElementById('ek2EmployeeName').textContent}</h3>
+                            <p>${document.getElementById('ek2EmployeeTc').textContent}</p>
+                            <p>${document.getElementById('ek2EmployeeWorkplace').textContent}</p>
+                            <p>${document.getElementById('ek2ExamDate').textContent}</p>
+                        </div>
+                        
+                        <div class="form-content">
+                            <h4>Muayene Detayları:</h4>
+                            <p>${content}</p>
+                            
+                            <h4>Kanaat ve Sonuç:</h4>
+                            <p>${result}</p>
+                        </div>
+                        
+                        <div class="signature-area">
+                            <div class="signature-line"></div>
+                            <p>İşyeri Hekimi İmza</p>
+                            <p>${document.getElementById('ek2DoctorName').textContent}</p>
+                            <p>${document.getElementById('ek2DiplomaInfo').textContent}</p>
+                            <p>${document.getElementById('ek2CertificateInfo').textContent}</p>
+                        </div>
+                        
+                        <script>
+                            window.onload = function() {
+                                window.print();
+                            }
+                        </script>
+                    </body>
+                    </html>
+                `);
+                printWindow.document.close();
+            } else {
+                Swal.fire('Uyarı!', 'Lütfen tüm alanları doldurun.', 'warning');
+            }
         }
         
         // Ayarları aç
